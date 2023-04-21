@@ -11,7 +11,7 @@ ll mod=1e9+7;
 ll p=31;
 int main(int argc, char* argv[]){
     std::ifstream fin(argv[1]);
-    int f=(argc>2);
+    int f=argv[2][0]-'0';
     std::ofstream fout("tmp.txt");
     Kokkos::Timer timer;
     std::string data;
@@ -37,13 +37,12 @@ int main(int argc, char* argv[]){
         int res=0;
         ll hash=0;
         powmod=1;
-#pragma omp simd
         for(int j=0;j<len;++j){
             if (data[i+j]=='A') hash=(hash+powmod)%mod;
             else if (data[i+j]=='C') hash=(hash+2LL*powmod)%mod;
             else if (data[i+j]=='G') hash=(hash+3LL*powmod)%mod;
             else  hash=(hash+4LL*powmod)%mod;
-            powmod*=31;
+            powmod*=p;
             powmod%=mod;
         }
         powmod=1;
@@ -58,11 +57,12 @@ int main(int argc, char* argv[]){
                 }
                 res+=is_eq;
             }
-            powmod*=31;
+            powmod*=p;
             powmod%=mod;
         }
         freq[i]=res;
     }
-    if (f) fout<<timer.seconds()-st<<" ";
+    if (f==1) fout<<timer.seconds()-st<<" ";
+    if (f==2) for(int i=0;i<=size-len;++i) fout<<freq[i];
     return 0;
 }
