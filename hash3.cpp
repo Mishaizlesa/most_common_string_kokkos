@@ -13,33 +13,30 @@ int main(int argc, char* argv[]) {
     std::ofstream fout("tmp.txt");
     Kokkos::initialize(argc, argv);{
         Kokkos::Timer timer;
-        Kokkos::View<ll*,Kokkos::SharedSpace> ord("ord", 256);
+        //int ord_[256];
         std::string data_;
         fin>>data_;
         ll size=data_.size();
         int len=(data_.size()>10000?1000:data_.size()/10);
         len=(len<3?3:len);
-        ord['A']=0LL;
-        ord['C']=1LL;
-        ord['G']=2LL;
-        ord['T']=3LL;
-        Kokkos::View<double*, Kokkos::SharedSpace> freq("array", size);
-        Kokkos::View<char*,Kokkos::SharedSpace> data("device_string",size);
-        Kokkos::View<int**,Kokkos::SharedSpace> shift("shift",size,64);
-        for(int i=0;i<size;++i){
-            data[i]=data_[i];
-            freq[i]=0;
-            for(int j=0;j<64;++j) shift(i,j)=len-2;
-        }
+        Kokkos::View<int*,Kokkos::SharedSpace> freq("array", size);
+        Kokkos::View<char*,Kokkos::SharedSpace> tmp("tmp",size);
+        for(int i=0;i<size;++i) tmp[i]=data_[i];
+        Kokkos::View<const char*,Kokkos::SharedSpace> data=tmp;
+    //Kokkos::deep_copy(data,tmp);
         timer.reset();
         double st=timer.seconds();
+        Kokkos::View<int**,Kokkos::DefaultExecutionSpace> shift("shift", size, 400);
         Kokkos::parallel_for( "yAx", size-len+1, KOKKOS_LAMBDA (int i) {
             //std::cout<<i<<"\n";
-            //int res=0;
+            //Kokkos::View<int*,Kokkos::CudaSpace> shift("shift", 400);
+            //Kokkos::vector<int>shift(400,len-2);
+            for(int j=0;j<400;++j) shift(i,j)=len-2;
+            int res=0;
             int sh1;
             ll hash=0;
             for(int j=2;j<=len-1;++j){
-                int ind=ord[data[i+j-2]]*16+ord[data[i+j-1]]*4+ord[data[i+j]];
+                int ind=(data[i+j-2]-'A')*16+(data[i+j-1]-'A')*4+(data[i+j]-'A');
                 if (j==len-1) sh1=shift(i,ind);
                 shift(i,ind)=len-1-j;
             }
@@ -49,7 +46,7 @@ int main(int argc, char* argv[]) {
             for(;;){
                 int sh=1;
                 while (sh && j<size) {
-                    int ind=ord[data[j-2]]*16+ord[data[j-1]]*4+ord[data[j]];
+                    int ind=(data[j-2]-'A')*16+(data[j-1]-'A')*4+(data[j]-'A');
                     sh=shift(i,ind);
                     j+=sh;
                 }
@@ -58,16 +55,18 @@ int main(int argc, char* argv[]) {
                     for(int k=0;k<len;++k){
                         if (data[i+k]!=data[j-len+1+k]){
                             is_eq=0;
+                            break;
                         }
                     }
-                    freq(i)+=is_eq;
+                    res+=is_eq;
                     j+=sh1;
                 }else{
                     break;
                 }
             }
-            //freq(i)=res;
+            freq(i)=res;
         });
+        Kokkos::fence();
         if (f==1){ fout<<timer.seconds()-st<<" ";}
         if (f==2){
             for(int i=0;i<=size-len;++i){

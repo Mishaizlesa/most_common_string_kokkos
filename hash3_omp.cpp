@@ -12,27 +12,23 @@ int main(int argc, char* argv[]) {
     int f=argv[2][0]-'0';
     std::ofstream fout("tmp.txt");
     Kokkos::Timer timer;
-    int ord[256];
     std::string data;
     fin>>data;
     ll size=data.size();
     int len=(data.size()>10000?1000:data.size()/10);
     len=(len<3?3:len);
-    ord['A']=0;
-    ord['C']=1;
-    ord['G']=2;
-    ord['T']=3;
     std::vector<int>freq(size,0);
     timer.reset();
     double st=timer.seconds();
-#pragma omp parallel for shared(freq)
+    std::vector<int>shift(400,len-2);
+#pragma omp parallel for shared(freq) firstprivate(shift)
     for(int i=0;i<=size-len;++i){
         int res=0;
         int sh1;
-        std::vector<int>shift(64,len-2);
         ll hash=0;
+        for(int j=0;j<400;++j) shift[j]=len-2;
         for(int j=2;j<=len-1;++j){
-            int ind=ord[data[i+j-2]]*16+ord[data[i+j-1]]*4+ord[data[i+j]];
+            int ind=(data[i+j-2]-'A')*16+(data[i+j-1]-'A')*4+(data[i+j]-'A');
             if (j==len-1) sh1=shift[ind];
             shift[ind]=len-1-j;
         }
@@ -42,7 +38,7 @@ int main(int argc, char* argv[]) {
         for(;;){
             int sh=1;
             while (sh && j<size) {
-                int ind=ord[data[j-2]]*16+ord[data[j-1]]*4+ord[data[j]];
+                int ind=(data[j-2]-'A')*16+(data[j-1]-'A')*4+(data[j]-'A');
                 sh=shift[ind];
                 j+=sh;
             }

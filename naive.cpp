@@ -31,6 +31,7 @@ int main(int argc, char* argv[]){
                 freq[i]+=is_eq;
             }
         });
+	Kokkos::fence();
         double fin=timer.seconds()-s;
         if (f==1){
             fout<<fin<<" ";

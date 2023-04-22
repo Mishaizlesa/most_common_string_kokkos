@@ -32,10 +32,7 @@ int main(int argc, char* argv[]){
         ll mod=1e9+7;
         ll powmod=1;
         for(int i=0;i<size;++i){
-            if (data_[i]=='A') dp_h[i+1]=(dp_h[i]+powmod)%mod;
-            else if (data_[i]=='C') dp_h[i+1]=(dp_h[i]+2LL*powmod)%mod;
-            else if (data_[i]=='G') dp_h[i+1]=(dp_h[i]+3LL*powmod)%mod;
-            else  dp_h[i+1]=(dp_h[i]+4LL*powmod)%mod;
+            dp_h[i+1]=(dp_h[i]+powmod*(data_[i]-'A'))%mod;
             powmod*=p;
             powmod%=mod;
         }
@@ -46,10 +43,7 @@ int main(int argc, char* argv[]){
             ll p=31;
             ll powmod=1;
             for(int j=0;j<len;++j){
-                if (data[i+j]=='A') hash=(hash+powmod)%mod;
-                else if (data[i+j]=='C') hash=(hash+2LL*powmod)%mod;
-                else if (data[i+j]=='G') hash=(hash+3LL*powmod)%mod;
-                else  hash=(hash+4LL*powmod)%mod;
+                hash=(hash+powmod*(data[i+j]-'A'))%mod;
                 powmod*=p;
                 powmod%=mod;
             }
@@ -70,6 +64,7 @@ int main(int argc, char* argv[]){
             }
             freq(i)=res;
         });
+        Kokkos::fence();
         if (f==1){
             fout<<timer.seconds()-st<<" ";
         }else if (f==2){

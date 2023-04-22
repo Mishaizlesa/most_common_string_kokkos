@@ -14,11 +14,6 @@ int main(int argc, char* argv[]){
     int f=argv[2][0]-'0';
     std::ofstream fout("tmp.txt");
     Kokkos::initialize(argc, argv);{
-        Kokkos::View<ll*, Kokkos::SharedSpace> ord("ord", 256);
-        ord['A']=1LL;
-        ord['C']=2LL;
-        ord['G']=3LL;
-        ord['T']=4LL;
         std::string data_;
         fin>>data_;
         ll size=data_.size();
@@ -32,7 +27,7 @@ int main(int argc, char* argv[]){
         ll def_val=0;
         ll powmod=1;
         for(int i=0;i<len;++i){
-            def_val=(def_val+ord[data[i]]*powmod)%mod;
+            def_val=(def_val+powmod*(data[i]-'A'))%mod;
             powmod*=p;
             powmod%=mod;
         }
@@ -47,7 +42,7 @@ int main(int argc, char* argv[]){
             ll powmod=1;
             ll tmp_h=0;
             for(int j=0;j<len;++j){
-                hash=(hash+ord[data[i+j]]*powmod)%mod;
+                hash=(hash+powmod*(data[i+j]-'A'))%mod;
                 powmod*=p;
                 powmod%=mod;
             }
@@ -68,7 +63,7 @@ int main(int argc, char* argv[]){
                 powlen%=mod;
             }
             for(int j=1;j<=size-len;++j){
-                tmp_h=(tmp_h-(ord[data[j-1]]*powmod)%mod+(ord[data[len+j-1]]*powmod*powlen)%mod+mod)%mod;
+                tmp_h=(tmp_h-(powmod*(data[j-1]-'A'))%mod+(powmod*powlen*(data[len+j-1]-'A'))%mod+mod)%mod;
                 powmod*=p;
                 powmod%=mod;
                 if (tmp_h==(hash*powmod)%mod){
@@ -83,6 +78,7 @@ int main(int argc, char* argv[]){
             }
             freq(i)=res;
         });
+        Kokkos::fence();
         if (f==1) fout<<timer.seconds()-st<<" ";
         else if (f==2){
             for(int i=0;i<size-len+1;++i){
