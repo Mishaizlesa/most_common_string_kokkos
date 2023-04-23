@@ -26,19 +26,19 @@ int main(int argc, char* argv[]) {
     //Kokkos::deep_copy(data,tmp);
         timer.reset();
         double st=timer.seconds();
-        Kokkos::View<int**,Kokkos::DefaultExecutionSpace> shift("shift", size, 400);
+        //Kokkos::View<int**,Kokkos::DefaultExecutionSpace> shift("shift", size, 400);
         Kokkos::parallel_for( "yAx", size-len+1, KOKKOS_LAMBDA (int i) {
             //std::cout<<i<<"\n";
             //Kokkos::View<int*,Kokkos::CudaSpace> shift("shift", 400);
-            //Kokkos::vector<int>shift(400,len-2);
-            for(int j=0;j<400;++j) shift(i,j)=len-2;
+            int shift[400];
+            for(int j=0;j<400;++j) shift[j]=len-2;
             int res=0;
             int sh1;
             ll hash=0;
             for(int j=2;j<=len-1;++j){
                 int ind=(data[i+j-2]-'A')*16+(data[i+j-1]-'A')*4+(data[i+j]-'A');
-                if (j==len-1) sh1=shift(i,ind);
-                shift(i,ind)=len-1-j;
+                if (j==len-1) sh1=shift[ind];
+                shift[ind]=len-1-j;
             }
             
             if (!sh1) sh1=1;
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
                 int sh=1;
                 while (sh && j<size) {
                     int ind=(data[j-2]-'A')*16+(data[j-1]-'A')*4+(data[j]-'A');
-                    sh=shift(i,ind);
+                    sh=shift[ind];
                     j+=sh;
                 }
                 if (j<size){
