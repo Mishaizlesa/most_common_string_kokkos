@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
         std::string data_;
         fin>>data_;
         ll size=data_.size();
-        int len=(data_.size()>10000?1000:data_.size()/10);
+        int len=std::stoi(argv[3]);
         len=(len<3?3:len);
         Kokkos::View<double*,Kokkos::SharedSpace> freq("array", size);
         Kokkos::View<ll*,Kokkos::SharedSpace> dp_h("dp_h", size+1);

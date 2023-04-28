@@ -15,17 +15,18 @@ int main(int argc, char* argv[]) {
     std::string data;
     fin>>data;
     ll size=data.size();
-    int len=(data.size()>10000?1000:data.size()/10);
+    int len=std::stoi(argv[3]);
     len=(len<3?3:len);
     std::vector<int>freq(size,0);
     timer.reset();
     double st=timer.seconds();
-    std::vector<int>shift(400,len-2);
-#pragma omp parallel for shared(freq) firstprivate(shift)
+    //std::vector<int>shift(400,len-2);
+#pragma omp parallel for shared(freq) /*firstprivate(shift)*/
     for(int i=0;i<=size-len;++i){
         int res=0;
         int sh1;
         ll hash=0;
+        int shift[400];
         for(int j=0;j<400;++j) shift[j]=len-2;
         for(int j=2;j<=len-1;++j){
             int ind=(data[i+j-2]-'A')*16+(data[i+j-1]-'A')*4+(data[i+j]-'A');

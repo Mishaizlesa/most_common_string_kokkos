@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
         std::string data_;
         fin>>data_;
         ll size=data_.size();
-        int len=(data_.size()>10000?1000:data_.size()/10);
+        int len=std::atoi(argv[3]);
         len=(len<3?3:len);
         Kokkos::View<int*,Kokkos::SharedSpace> freq("array", size);
         Kokkos::View<char*,Kokkos::SharedSpace> tmp("tmp",size);
@@ -72,6 +72,12 @@ int main(int argc, char* argv[]) {
             for(int i=0;i<=size-len;++i){
                 fout<<freq[i];
             }
+        }else if (f==3){
+            int mmax=0;
+            for(int i=0;i<size;++i){
+                mmax=(mmax>freq[i]?mmax:freq[i]);
+            }
+            fout<<mmax;
         }
     }
     Kokkos::finalize();
