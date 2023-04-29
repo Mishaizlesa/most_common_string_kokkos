@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
         Kokkos::parallel_for( "yAx", size-len+1, KOKKOS_LAMBDA (int i) {
             for(int j=0;j<size-len+1;++j){
                 int is_eq=1;
-                for(int k=0;k<len;++k){
+                for(int k=0;k<len && is_eq;++k){
                     if (data[i+k]!=data[j+k]) is_eq=0;
                 }
                 freq[i]+=is_eq;
