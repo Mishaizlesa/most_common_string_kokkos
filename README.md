@@ -40,5 +40,5 @@
 [![CPU-GPU-RATIO.png](https://i.postimg.cc/FKbNJLJn/CPU-GPU-RATIO.png)](https://postimg.cc/QBMR2Vmp)
 
 
-
+[![gpu-time.png](https://i.postimg.cc/Px2HSnyW/gpu-time.png)](https://postimg.cc/1nnbzTLX)
 
